@@ -12,10 +12,9 @@
         <ToolbarItem Text="Add" Clicked="AddItem_Clicked" />
     </ContentPage.ToolbarItems>
 
-    <StackLayout>
-        <RefreshView Command="{Binding LoadItemsCommand}"
-                     IsRefreshing="{Binding IsBusy, Mode=OneWay}">
-
+    <Grid>
+        <RefreshView Command="{Binding RefreshItemsCommand}"
+                     IsRefreshing="{Binding IsRefreshing}">
             <CollectionView x:Name="ItemsCollectionView"
                             ItemsSource="{Binding Items}"
                             VerticalOptions="FillAndExpand"
@@ -50,6 +49,11 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </RefreshView>
-    </StackLayout>
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           HeightRequest="30"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           WidthRequest="30"/>
+    </Grid>
 
 </ContentPage>

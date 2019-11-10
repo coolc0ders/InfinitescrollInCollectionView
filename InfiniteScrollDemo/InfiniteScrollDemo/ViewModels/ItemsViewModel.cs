@@ -16,15 +16,22 @@ namespace InfiniteScrollDemo.ViewModels
         public ObservableCollection<Item> Items { get; set; }
         public Command LoadItemsCommand { get; set; }
         public Command ItemTresholdReachedCommand { get; set; }
+        public Command RefreshItemsCommand { get; set; }
         public const string ScrollToPreviousLastItem = "Scroll_ToPrevious";
         private int _itemTreshold;
+        private bool _isRefreshing;
+
+        public bool IsRefreshing
+        {
+            get { return _isRefreshing; }
+            set { SetProperty(ref _isRefreshing, value); }
+        }
 
         public int ItemTreshold
         {
             get { return _itemTreshold; }
             set { SetProperty(ref _itemTreshold, value); }
         }
-
 
         public ItemsViewModel()
         {
@@ -33,6 +40,11 @@ namespace InfiniteScrollDemo.ViewModels
             Items = new ObservableCollection<Item>();
             LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
             ItemTresholdReachedCommand = new Command(async () => await ItemsTresholdReached());
+            RefreshItemsCommand = new Command(async () =>
+            {
+                await ExecuteLoadItemsCommand();
+                IsRefreshing = false;
+            });
             MessagingCenter.Subscribe<NewItemPage, Item>(this, "AddItem", async (obj, item) =>
             {
                 var newItem = item as Item;
@@ -57,12 +69,13 @@ namespace InfiniteScrollDemo.ViewModels
                 {
                     Items.Add(item);
                 }
-                if (items.Count() == Items.Count)
+                Debug.WriteLine($"{items.Count()} {Items.Count} ");
+                if (items.Count() == 0)
                 {
                     ItemTreshold = -1;
                     return;
                 }
-                MessagingCenter.Send<object, Item>(this, ScrollToPreviousLastItem, previousLastItem);
+                //MessagingCenter.Send<object, Item>(this, ScrollToPreviousLastItem, previousLastItem);
             }
             catch (Exception ex)
             {
@@ -72,8 +85,6 @@ namespace InfiniteScrollDemo.ViewModels
             {
                 IsBusy = false;
             }
-
-            IsBusy = false;
         }
 
         async Task ExecuteLoadItemsCommand()
@@ -82,6 +93,7 @@ namespace InfiniteScrollDemo.ViewModels
                 return;
 
             IsBusy = true;
+
 
             try
             {
