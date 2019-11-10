@@ -94,7 +94,6 @@ namespace InfiniteScrollDemo.ViewModels
 
             IsBusy = true;
 
-
             try
             {
                 ItemTreshold = 1;
